@@ -18,16 +18,23 @@
 - 📊 **详细日志**: 结构化日志记录，便于调试
 - 🐳 **Docker支持**: 容器化部署，开箱即用
 
+## ⚠ 风险警告
+
+- 此项目属于研究交流学习性质，不接受任何资金捐助和金钱交易！
+- 仅限自用和个人研究，避免对官方造成服务压力，否则轻者可能封号，重者可能触犯法律！
+- 仅限自用和个人研究，避免对官方造成服务压力，否则轻者可能封号，重者可能触犯法律！
+- 仅限自用和个人研究，避免对官方造成服务压力，否则轻者可能封号，重者可能触犯法律！
+
 ## ✨ 新功能亮点
 
 ### 📐 ratio参数支持
 
-文生图接口新增`ratio`参数，支持直观的比例格式，与即梦官网保持完全统一：
+仅`ratio`参数，移除了size、width、height等参数，避免造成误解，与即梦官网保持完全一致：
 
 ```bash
 curl -X POST http://localhost:5100/v1/images/generations \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-4.0",
     "prompt": "美丽的少女，胶片感",
@@ -37,9 +44,10 @@ curl -X POST http://localhost:5100/v1/images/generations \
 
 **支持比例**: `1:1`, `4:3`, `3:4`, `16:9`, `9:16`, `3:2`, `2:3`, `21:9` (仅支持官网标准比例)
 
-**参数优先级**: `ratio` > `size` > `width/height`
-
 ## 🚀 快速开始
+
+### sessionid获取
+![](https://github.com/iptag/jimeng-api/blob/main/get_sessionid.png)
 
 ### 环境要求
 
@@ -49,7 +57,17 @@ curl -X POST http://localhost:5100/v1/images/generations \
 
 ### 安装部署
 
-#### 方式一：直接运行
+#### 方式一：直接拉取docker镜像
+
+```bash
+docker run -d \
+  --name jimeng-api \
+  -p 5100:5100 \
+  --restart unless-stopped \
+  iptag/jimeng:latest
+```
+
+#### 方式二：直接运行
 
 ```bash
 # 克隆项目
@@ -67,18 +85,44 @@ cp configs/dev/system.yml.example configs/dev/system.yml
 npm start
 ```
 
-#### 方式二：Docker部署
+#### 方式三：Docker部署（推荐）
 
+##### 🚀 快速启动
 ```bash
-# 构建镜像
+# 使用docker-compose（推荐）
+docker-compose up -d
+
+# 或者手动构建和运行
 docker build -t jimeng-api .
 
-# 运行容器
 docker run -d \
   --name jimeng-api \
   -p 5100:5100 \
+  --restart unless-stopped \
   jimeng-api
 ```
+
+##### 🔧 常用命令
+```bash
+# 重新构建并启动
+docker-compose up -d --build
+
+# 查看服务日志
+docker logs jimeng-api
+
+# 停止服务
+docker-compose down
+
+# 进入容器调试
+docker exec -it jimeng-api sh
+```
+
+##### 📊 Docker镜像特性
+- ✅ **多阶段构建**：优化镜像大小（167MB）
+- ✅ **非root用户**：增强安全性（jimeng用户）
+- ✅ **健康检查**：自动监控服务状态
+- ✅ **统一端口**：容器内外均使用5100端口
+- ✅ **日志管理**：结构化日志输出
 
 ### 配置说明
 
@@ -104,20 +148,15 @@ debug: false
 **请求参数**:
 - `model` (string): 使用的模型名称
 - `prompt` (string): 图像描述文本
-- `ratio` (string, 可选, 三选一): 图像比例，如 "4:3", "16:9", "1:1" 等
-- `size` (string, 可选, 三选一): 图像尺寸，如 "2048x2048"
-- `width` (number, 可选,三选一a): 图像宽度
-- `height` (number, 可选, 三选一b): 图像高度
+- `ratio` (string, 可选): 图像比例，如 "4:3", "16:9", "1:1" 等，默认为 "1:1"
 - `negative_prompt` (string, 可选): 负面提示词
 - `sample_strength` (number, 可选): 采样强度 (0.0-1.0)
 - `response_format` (string, 可选): 响应格式 ("url" 或 "b64_json")
 
-**参数优先级**: `ratio` > `size` > `width/height`
-
 ```bash
 curl -X POST http://localhost:5100/v1/images/generations \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-4.0",
     "prompt": "一只可爱的小猫咪",
@@ -127,41 +166,20 @@ curl -X POST http://localhost:5100/v1/images/generations \
 # 使用不同比例的示例
 curl -X POST http://localhost:5100/v1/images/generations \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-4.0",
     "prompt": "壮丽的山水风景",
     "ratio": "21:9",
   }'
-
-# 使用ratio参数的示例（推荐）
-curl -X POST http://localhost:5100/v1/images/generations \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
-  -d '{
-    "model": "jimeng-4.0",
-    "prompt": "美丽的少女，胶片感",
-    "ratio": "4:3",
-  }'
-
-# 使用width/height参数的示例
-curl -X POST http://localhost:5100/v1/images/generations \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
-  -d '{
-    "model": "jimeng-4.0",
-    "prompt": "现代建筑设计",
-    "width": 1536,
-    "height": 2304,
-  }'
 ```
 
 **支持的模型**:
-- `jimeng-4.0` - 最新高质量模型
-- `jimeng-3.1` - 艺术风格模型
-- `jimeng-3.0` - 通用模型
-- `jimeng-2.1` - 轻量级模型
-- `jimeng-xl-pro` - 专业模型
+- `jimeng-4.0`
+- `jimeng-3.1` 调用4.0以下模型时须有官网购买的积分，每日赠送的不行，不然会提示积分不够
+- `jimeng-3.0`
+- `jimeng-2.1`
+- `jimeng-xl-pro`
 
 **支持的分辨率**:
 
@@ -188,14 +206,10 @@ curl -X POST http://localhost:5100/v1/images/generations \
 - `images` (array): 输入图片数组，支持以下格式：
   - 字符串数组: `["http://example.com/image1.jpg", "http://example.com/image2.jpg"]`
   - 对象数组: `[{"url": "http://example.com/image1.jpg"}, {"url": "http://example.com/image2.jpg"}]`
-- `ratio` (string, 可选): 图像比例，支持 `1:1`, `4:3`, `3:4`, `16:9`, `9:16`, `3:2`, `2:3`, `21:9`
-- `width` (number, 可选): 输出图像宽度，默认2560
-- `height` (number, 可选): 输出图像高度，默认1440
+- `ratio` (string, 可选): 图像比例，支持 `1:1`, `4:3`, `3:4`, `16:9`, `9:16`, `3:2`, `2:3`, `21:9`，默认为 "1:1"
 - `negative_prompt` (string, 可选): 负面提示词，描述不希望出现的内容
 - `sample_strength` (number, 可选): 采样强度 (0.0-1.0)，控制对原图的保留程度
 - `response_format` (string, 可选): 响应格式 ("url" 或 "b64_json")
-
-**参数优先级**: `ratio` > `width/height`
 
 **使用限制**:
 - 输入图片数量: 1-10张
@@ -209,7 +223,7 @@ curl -X POST http://localhost:5100/v1/images/generations \
 # 单图风格转换
 curl -X POST http://localhost:5100/v1/images/compositions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-4.0",
     "prompt": "将这张照片转换为油画风格，色彩鲜艳，笔触明显",
@@ -221,7 +235,7 @@ curl -X POST http://localhost:5100/v1/images/compositions \
 # 多图混合合成
 curl -X POST http://localhost:5100/v1/images/compositions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-4.0",
     "prompt": "将这些图片融合成一幅梦幻的超现实主义作品",
@@ -238,7 +252,7 @@ curl -X POST http://localhost:5100/v1/images/compositions \
 # 使用对象格式的图片数组
 curl -X POST http://localhost:5100/v1/images/compositions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-4.0",
     "prompt": "创建一个科幻风格的城市景观",
@@ -246,8 +260,7 @@ curl -X POST http://localhost:5100/v1/images/compositions \
       {"url": "https://example.com/city.jpg"},
       {"url": "https://example.com/sci-fi-elements.jpg"}
     ],
-    "width": 2688,
-    "height": 1152,
+    "ratio": "21:9",
     "response_format": "url"
   }'
 ```
@@ -372,7 +385,7 @@ A: 需要先将本地图片上传到可访问的网络地址，然后使用该UR
 ```bash
 curl -X POST http://localhost:5100/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-video-3.0",
     "messages": [
@@ -398,7 +411,7 @@ curl -X POST http://localhost:5100/v1/chat/completions \
 ```bash
 curl -X POST http://localhost:5100/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_REFRESH_TOKEN" \
+  -H "Authorization: Bearer YOUR_SESSION_ID" \
   -d '{
     "model": "jimeng-4.0",
     "messages": [
@@ -535,9 +548,9 @@ export const RETRY_CONFIG = {
    - 检查请求体格式是否正确
    - 系统会自动修复常见格式问题
 
-2. **Token失效**
-   - 重新获取refresh_token
-   - 检查token格式是否正确
+2. **Sessionid失效**
+   - 重新获取Sessionid
+   - 检查Sessionid格式是否正确
 
 3. **生成超时**
    - 图像生成：通常1-3分钟

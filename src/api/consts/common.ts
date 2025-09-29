@@ -74,14 +74,4 @@ export const ASPECT_RATIOS = {
   "21:9": { width: 2688, height: 1152, ratio: 8 }
 };
 
-// 分辨率字符串到尺寸的映射
-export const SIZE_MAP = {
-  "2048x2048": { width: 2048, height: 2048 },  // 1:1
-  "2304x1728": { width: 2304, height: 1728 },  // 4:3
-  "1728x2304": { width: 1728, height: 2304 },  // 3:4
-  "2304x1296": { width: 2304, height: 1296 },  // 16:9
-  "1296x2304": { width: 1296, height: 2304 },  // 9:16
-  "2304x1536": { width: 2304, height: 1536 },  // 3:2
-  "1536x2304": { width: 1536, height: 2304 },  // 2:3
-  "2688x1152": { width: 2688, height: 1152 }   // 21:9
-};
+

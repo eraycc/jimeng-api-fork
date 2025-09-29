@@ -1,9 +1,72 @@
-logs
-dist
-doc
+# 依赖和构建产物
 node_modules
+dist
+*.log
+logs
+
+# 开发工具
 .vscode
+.idea
+*.swp
+*.swo
+*~
+
+# 版本控制
 .git
 .gitignore
+.gitattributes
+
+# 文档和说明
 README.md
+*.md
+doc
+docs
+
+# 测试文件
+test
+tests
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+coverage
+
+# 配置文件
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.eslintrc*
+.prettierrc*
+jest.config.*
+*.config.js
+*.config.ts
+
+# 临时文件
+*.tmp
+*.temp
+*.cache
+.DS_Store
+Thumbs.db
+
+# 压缩文件
 *.tar.gz
+*.zip
+*.rar
+
+# Docker相关
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# 其他
+*.pid
+*.seed
+*.pid.lock

@@ -1,21 +1,65 @@
-FROM node:lts AS BUILD_IMAGE
+# 构建阶段
+FROM node:18-alpine AS builder
 
+# 设置工作目录
 WORKDIR /app
 
-COPY . /app
+# 安装构建依赖（包括Python和make，某些npm包需要）
+RUN apk add --no-cache python3 make g++
 
-RUN yarn install --registry https://registry.npmmirror.com/ --ignore-engines && yarn run build
+# 复制package文件以优化Docker层缓存
+COPY package.json yarn.lock ./
 
-FROM node:lts-alpine
+# 安装所有依赖（包括devDependencies）
+RUN yarn install --frozen-lockfile --registry https://registry.npmmirror.com/ --ignore-engines
 
-COPY --from=BUILD_IMAGE /app/configs /app/configs
-COPY --from=BUILD_IMAGE /app/package.json /app/package.json
-COPY --from=BUILD_IMAGE /app/dist /app/dist
-COPY --from=BUILD_IMAGE /app/public /app/public
-COPY --from=BUILD_IMAGE /app/node_modules /app/node_modules
+# 复制源代码
+COPY . .
 
+# 构建应用
+RUN yarn build
+
+# 生产阶段
+FROM node:18-alpine AS production
+
+# 安装健康检查工具
+RUN apk add --no-cache wget
+
+# 创建非root用户
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S jimeng -u 1001
+
+# 设置工作目录
 WORKDIR /app
 
-EXPOSE 8000
+# 复制package文件
+COPY package.json yarn.lock ./
 
-CMD ["npm", "start"]
+# 只安装生产依赖
+RUN yarn install --frozen-lockfile --production --registry https://registry.npmmirror.com/ --ignore-engines && \
+    yarn cache clean
+
+# 从构建阶段复制构建产物
+COPY --from=builder --chown=jimeng:nodejs /app/dist ./dist
+COPY --from=builder --chown=jimeng:nodejs /app/public ./public
+COPY --from=builder --chown=jimeng:nodejs /app/configs ./configs
+
+# 创建应用需要的目录并设置权限
+RUN mkdir -p /app/logs /app/tmp && \
+    chown -R jimeng:nodejs /app/logs /app/tmp
+
+# 设置环境变量
+ENV SERVER_PORT=5100
+
+# 切换到非root用户
+USER jimeng
+
+# 暴露端口
+EXPOSE 5100
+
+# 健康检查
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget -q --spider http://localhost:5100/ping
+
+# 启动应用
+CMD ["yarn", "start"]
