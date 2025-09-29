@@ -57,7 +57,17 @@ curl -X POST http://localhost:5100/v1/images/generations \
 
 ### 安装部署
 
-#### 方式一：直接运行
+#### 方式一：直接拉取docker镜像
+
+```bash
+docker run -d \
+  --name jimeng-api \
+  -p 5100:5100 \
+  --restart unless-stopped \
+  iptag/jimeng:latest
+```
+
+#### 方式二：直接运行
 
 ```bash
 # 克隆项目
@@ -75,18 +85,44 @@ cp configs/dev/system.yml.example configs/dev/system.yml
 npm start
 ```
 
-#### 方式二：Docker部署
+#### 方式三：Docker部署（推荐）
 
+##### 🚀 快速启动
 ```bash
-# 构建镜像
+# 使用docker-compose（推荐）
+docker-compose up -d
+
+# 或者手动构建和运行
 docker build -t jimeng-api .
 
-# 运行容器
 docker run -d \
   --name jimeng-api \
   -p 5100:5100 \
+  --restart unless-stopped \
   jimeng-api
 ```
+
+##### 🔧 常用命令
+```bash
+# 重新构建并启动
+docker-compose up -d --build
+
+# 查看服务日志
+docker logs jimeng-api
+
+# 停止服务
+docker-compose down
+
+# 进入容器调试
+docker exec -it jimeng-api sh
+```
+
+##### 📊 Docker镜像特性
+- ✅ **多阶段构建**：优化镜像大小（167MB）
+- ✅ **非root用户**：增强安全性（jimeng用户）
+- ✅ **健康检查**：自动监控服务状态
+- ✅ **统一端口**：容器内外均使用5100端口
+- ✅ **日志管理**：结构化日志输出
 
 ### 配置说明
 

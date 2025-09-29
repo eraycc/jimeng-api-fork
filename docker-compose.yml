@@ -1,0 +1,27 @@
+services:
+  jimeng-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jimeng
+    container_name: jimeng-api
+    restart: unless-stopped
+    ports:
+      - "5100:5100"
+    #volumes:
+    #  # 挂载日志目录（确保权限正确）
+    #  - ./logs:/app/logs
+    #  # 挂载临时目录
+    #  - ./tmp:/app/tmp
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5100/ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

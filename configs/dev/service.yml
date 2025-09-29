@@ -3,4 +3,4 @@ name: jimeng-free-api
 # 服务绑定主机地址
 host: '0.0.0.0'
 # 服务绑定端口
-port: 8000
+port: 5100
