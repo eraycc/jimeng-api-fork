@@ -139,11 +139,11 @@ curl -X POST http://localhost:5100/v1/images/generations \
 ```
 
 **支持的模型**:
-- `jimeng-4.0` - 最新高质量模型
-- `jimeng-3.1` - 艺术风格模型，调用4.0以下模型时须账号保持有购买的积分，每日赠送的积分不行，不然会提示积分不够
-- `jimeng-3.0` - 通用模型
-- `jimeng-2.1` - 轻量级模型
-- `jimeng-xl-pro` - 专业模型
+- `jimeng-4.0`
+- `jimeng-3.1` 调用4.0以下模型时须有官网购买的积分，每日赠送的不行，不然会提示积分不够
+- `jimeng-3.0`
+- `jimeng-2.1`
+- `jimeng-xl-pro`
 
 **支持的分辨率**:
 
