@@ -3,7 +3,7 @@ import _ from "lodash";
 import Request from "@/lib/request/Request.ts";
 import { generateImages, generateImageComposition } from "@/api/controllers/images.ts";
 import { tokenSplit } from "@/api/controllers/core.ts";
-import { SIZE_MAP } from "@/api/consts/common.ts";
+import { SIZE_MAP, ASPECT_RATIOS } from "@/api/consts/common.ts";
 import util from "@/lib/util.ts";
 
 // 解析ratio参数为width和height（仅支持官网标准比例）
